@@ -1,0 +1,50 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.2.BUILD-SNAPSHOT'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+    id "io.franzbecker.gradle-lombok" version "1.14"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.folio3.blog.dynamodbt'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+dependencyManagement {
+    imports {
+        mavenBom 'software.amazon.awssdk:bom:2.0.2'
+    }
+}
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+	maven { url "http://repo.opensourceagility.com/release/" }
+}
+
+
+dependencies {
+	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+	implementation('org.springframework.boot:spring-boot-starter-web')
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.186'
+    compile "com.github.derjust:spring-data-dynamodb:5.0.3"
+    compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.0.2.RELEASE'
+	compile "com.fasterxml.jackson.core:jackson-databind:2.9.4"
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
