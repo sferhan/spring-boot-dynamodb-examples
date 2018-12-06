@@ -15,10 +15,10 @@
  */
 package com.folio3.blog.dynamodbt.demo;
 
-import java.util.List;
-
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 
 @EnableScan
 public interface MusicRespository extends CrudRepository<Music, MusicCompositeKey> {

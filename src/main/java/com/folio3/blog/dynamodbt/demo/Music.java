@@ -15,17 +15,22 @@
  */
 package com.folio3.blog.dynamodbt.demo;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
+
 @DynamoDBTable(tableName = "Music")
+@Data
+@NoArgsConstructor
 public class Music {
 
     @Id
+    // To ignore getters and setter for 'id' field
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    // ---------------------
 	public MusicCompositeKey id;
 
     @DynamoDBAttribute
@@ -40,10 +45,6 @@ public class Music {
     @DynamoDBAttribute
     @DynamoDBIndexHashKey(attributeName = "year", globalSecondaryIndexName="year-index")
     private Integer year;
-
-    public Music() {
-		// Default constructor is required by AWS DynamoDB SDK
-	}
 
     public Music(String artist, String songTitle, String genre, String albumTitle, Integer year, List<Review> reviews) {
         this.genre = genre;
@@ -79,60 +80,5 @@ public class Music {
         }
         this.id.setSongTitle(songTitle);
     }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getAlbumTitle() {
-        return albumTitle;
-    }
-
-    public void setAlbumTitle(String albumTitle) {
-        this.albumTitle = albumTitle;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    @Override
-	public String toString() {
-		return "Music [id=" + this.id + ", artist=" + this.id.getArtist() + ", songTitle=" + this.id.getSongTitle() + ", genre"+ this.genre +", albumTitle "+ this.albumTitle +", criticRating"+ this.reviews +"]";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.id, this.id.getArtist(), this.id.getSongTitle(), this.genre, this.albumTitle, this.reviews);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Music other = (Music) obj;
-		return Arrays.deepEquals(new Object[]{id, this.id.getArtist(), this.id.getSongTitle(), genre, albumTitle, year, reviews},
-				new Object[]{other.id, other.id.getArtist(), other.id.getSongTitle(), other.genre, other.albumTitle, other.year, other.reviews});
-	}
 
 }
