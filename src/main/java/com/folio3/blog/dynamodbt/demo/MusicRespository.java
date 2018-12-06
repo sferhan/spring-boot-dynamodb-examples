@@ -16,13 +16,26 @@
 package com.folio3.blog.dynamodbt.demo;
 
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
+import org.socialsignin.spring.data.dynamodb.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
 @EnableScan
 public interface MusicRespository extends CrudRepository<Music, MusicCompositeKey> {
-	List<Music> findByArtist(String artist);
+
+    List<Music> findByArtist(String artist);
+
 	List<Music> findBySongTitle(String songTitle);
+
+    @Query(fields = "artist, songTitle")
+    // Note : If projections are used on Global Secondary Indexes, the index must contain the desired fields in the first place
 	List<Music> findByYear(Integer year);
+
+	List<Music> findByQuality(String quality);
+
+	// Note : Order by can be done on one of the attributes of the same index. For example we wouldn't be able to order by 'year' when finding by artist
+    // because our index only contains 'artist' and 'songTitle'
+	List<Music> findByArtistOrderBySongTitleDesc(String artist);
+
 }

@@ -26,8 +26,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Music {
 
+    // Spring-Data requires having a dedicated entity representing the key
     @Id
-    // To ignore getters and setter for 'id' field
+    // To ignore getter and setter for 'id' field : otherwise gives Mapping Exception
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     // ---------------------
@@ -43,14 +44,18 @@ public class Music {
     private List<Review> reviews;
 
     @DynamoDBAttribute
+    private MiscellaneousInformation otherinfo;
+
+    @DynamoDBAttribute
     @DynamoDBIndexHashKey(attributeName = "year", globalSecondaryIndexName="year-index")
     private Integer year;
 
-    public Music(String artist, String songTitle, String genre, String albumTitle, Integer year, List<Review> reviews) {
+    public Music(String artist, String songTitle, String genre, String albumTitle, Integer year, List<Review> reviews, MiscellaneousInformation otherinfo) {
         this.genre = genre;
         this.albumTitle = albumTitle;
         this.year = year;
         this.reviews = reviews;
+        this.otherinfo = otherinfo;
         this.id = new MusicCompositeKey();
         this.id.setArtist(artist);
         this.id.setSongTitle(songTitle);
@@ -80,5 +85,23 @@ public class Music {
         }
         this.id.setSongTitle(songTitle);
     }
+
+    // Create an index on Miscellaneous.quality to be able to query on a sub-document
+    @DynamoDBIndexRangeKey(localSecondaryIndexName = "quality-index")
+    public String getQuality() {
+        if(otherinfo != null) {
+            return otherinfo.getQuality();
+        }
+        return null;
+    }
+
+    public void setQuality(String quality) {
+        if(otherinfo != null) {
+            otherinfo.quality = quality;
+            return;
+        }
+        otherinfo =  new MiscellaneousInformation(quality);
+    }
+    // ---------------------------------------------------------------------------------
 
 }

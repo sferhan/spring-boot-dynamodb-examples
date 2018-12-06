@@ -84,9 +84,9 @@ public class DemoApplicationTests {
         reviews.add(new Review("Really good song", 4.5f));
         reviews.add(new Review("Excellent", 4.7f));
 
-        Music song1 = new Music("No one you know", "My Dog Spot", "Country", "Hey Now", 1984, reviews);
+        Music song1 = new Music("No one you know", "My Dog Spot", "Country", "Hey Now", 1984, reviews, new MiscellaneousInformation("Good"));
         musicRespository.save(song1);
-        Music song2 = new Music("No one you know", "Somewhere Down The Road", "Country", "Somewhat Famous", 1985, reviews);
+        Music song2 = new Music("No one you know", "Somewhere Down The Road", "Country", "Somewhat Famous", 1985, reviews, new MiscellaneousInformation("Excellent"));
         musicRespository.save(song2);
         Assert.assertEquals(musicRespository.count(), 2);
         log.info("Insertion test successful");
@@ -103,6 +103,12 @@ public class DemoApplicationTests {
         Assert.assertEquals(2, hashKeySearchResult.size());
         log.info("Query by by HashKey test successful");
 
+        //Query by hash key and Order by songTitle
+        List<Music> hashKeySearchResultOrdered = musicRespository.findByArtistOrderBySongTitleDesc("No one you know");
+        // When sorted in descending order song1 will on second position
+        Assert.assertEquals(song1, hashKeySearchResultOrdered.get(1));
+        log.info("Query by by HashKey test successful");
+
         // Query by range key
         List<Music> rangeKeySearchResult = musicRespository.findBySongTitle("My Dog Spot");
         Assert.assertEquals(1, rangeKeySearchResult.size());
@@ -116,11 +122,19 @@ public class DemoApplicationTests {
         Assert.assertEquals(queryByIdResult.get(), song2);
         log.info("Query by ID test successful");
 
-        // Query by a non key attribute by making an index on that attribute
+        // Query by a non key attribute by making an index on that attribute and apply projection
         List<Music> queryUsingIndexResult = musicRespository.findByYear(1984);
         Assert.assertEquals(1, queryUsingIndexResult.size());
         Assert.assertEquals(queryUsingIndexResult.get(0).id, song1.id);
-        log.info("Query using Index test successful");
+        // since we have used projection for getting 'artist' and 'songTitle', we expect all other attributes to be null
+        Assert.assertEquals(null,  queryUsingIndexResult.get(0).getYear());
+        log.info("Query using Index and Projection test successful");
+
+        // Query by a secondary index on a attribute in sub-document
+        List<Music> queryUsingSecondaryIndexResult = musicRespository.findByQuality("Good");
+        Assert.assertEquals(1, queryUsingSecondaryIndexResult.size());
+        Assert.assertThat(queryUsingSecondaryIndexResult, hasItem(song1));
+        log.info("Query using Secondary Index test successful");
 
         // Scan : Searching using an attribute that is neither a partition key nor range key and also does not have any index on it
         List<Music> scanResult = musicRespository.findByYear(1984);
