@@ -21,6 +21,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
+// Enable scanning the database table in case the search column is neither a key attribute nor has an Index on it
 @EnableScan
 public interface MusicRespository extends CrudRepository<Music, MusicCompositeKey> {
 
@@ -33,6 +34,8 @@ public interface MusicRespository extends CrudRepository<Music, MusicCompositeKe
 	List<Music> findByYear(Integer year);
 
 	List<Music> findByQuality(String quality);
+
+	List<Music> findByGenre(String genre);
 
 	// Note : Order by can be done on one of the attributes of the same index. For example we wouldn't be able to order by 'year' when finding by artist
     // because our index only contains 'artist' and 'songTitle'
